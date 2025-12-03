@@ -3,10 +3,16 @@ import 'package:http/http.dart' as http;
 import '../models/quiz_models.dart';
 
 class AIService {
-  static const String _textApiKey =
-      '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';
-  static const String _imageApiKey =
-      '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';
+  static const String _textApiKey = String.fromEnvironment(
+    'TEXT_API_KEY',
+    defaultValue:
+        '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',
+  );
+  static const String _imageApiKey = String.fromEnvironment(
+    'IMAGE_API_KEY',
+    defaultValue:
+        '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',
+  );
   static const String _baseUrl =
       'https://openrouter.ai/api/v1/chat/completions';
   static const String _textModel = 'x-ai/grok-4.1-fast:free';
