@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import '../models/user_model.dart';
 
 class AuthService extends ChangeNotifier {
@@ -42,53 +43,57 @@ class AuthService extends ChangeNotifier {
 
   Future<User?> signInWithGoogle() async {
     try {
-      // Initialize GoogleSignIn
-      await _googleSignIn.initialize();
-
-      // Attempt to sign in
-      final GoogleSignInAccount? googleUser = await _googleSignIn
-          .authenticate();
-      if (googleUser == null) return null;
-
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: null, // accessToken is removed in v7
-        idToken: googleAuth.idToken,
-      );
-
-      final UserCredential userCredential = await _auth.signInWithCredential(
-        credential,
-      );
-
-      final user = userCredential.user;
-      if (user != null) {
-        // Check if user exists
-        final userDoc = await _firestore
-            .collection('users')
-            .doc(user.uid)
-            .get();
-        if (!userDoc.exists) {
-          // Create new user
-          final newUser = UserModel(
-            uid: user.uid,
-            email: user.email ?? '',
-            displayName: user.displayName ?? 'User',
-            photoUrl: user.photoURL ?? '',
-            totalScore: 0,
-          );
-          await _firestore
-              .collection('users')
-              .doc(user.uid)
-              .set(newUser.toMap());
+      if (kIsWeb) {
+        // Web-specific sign-in
+        final GoogleAuthProvider googleProvider = GoogleAuthProvider();
+        final UserCredential userCredential = await _auth.signInWithPopup(
+          googleProvider,
+        );
+        final user = userCredential.user;
+        if (user != null) {
+          await _checkAndCreateUser(user);
         }
-      }
+        return user;
+      } else {
+        // Mobile sign-in
+        final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+        if (googleUser == null) return null;
 
-      return user;
+        final GoogleSignInAuthentication googleAuth =
+            await googleUser.authentication;
+
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          idToken: googleAuth.idToken,
+          accessToken: null,
+        );
+
+        final UserCredential userCredential = await _auth.signInWithCredential(
+          credential,
+        );
+
+        final user = userCredential.user;
+        if (user != null) {
+          await _checkAndCreateUser(user);
+        }
+        return user;
+      }
     } catch (e) {
       debugPrint('Error signing in with Google: $e');
       return null;
+    }
+  }
+
+  Future<void> _checkAndCreateUser(User user) async {
+    final userDoc = await _firestore.collection('users').doc(user.uid).get();
+    if (!userDoc.exists) {
+      final newUser = UserModel(
+        uid: user.uid,
+        email: user.email ?? '',
+        displayName: user.displayName ?? 'User',
+        photoUrl: user.photoURL ?? '',
+        totalScore: 0,
+      );
+      await _firestore.collection('users').doc(user.uid).set(newUser.toMap());
     }
   }
 
