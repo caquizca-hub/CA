@@ -5,6 +5,6 @@
         "build": "bash tool/vercel_install.sh && bash tool/vercel_build.sh"
     },
     "engines": {
-        "node": "18.x"
+        "node": "24.x"
     }
 }
