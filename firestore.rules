@@ -1,0 +1,43 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user is the specific admin
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.email == 'jupiterbania472@gmail.com';
+    }
+
+    // Questions Collection
+    // - Read: Any authenticated user
+    // - Write: Only the admin
+    match /questions/{questionId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Chapters Collection
+    // - Read: Any authenticated user
+    // - Write: Only the admin
+    match /chapters/{chapterId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Users Collection (for Profiles and Leaderboard)
+    // - Read: Any authenticated user (required for Leaderboard)
+    // - Write: Users can only create/update their OWN document
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+
+      match /history/{historyId} {
+        allow read, write: if isAuthenticated() && request.auth.uid == userId;
+      }
+    }
+  }
+}
