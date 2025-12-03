@@ -56,7 +56,8 @@ class AuthService extends ChangeNotifier {
         return user;
       } else {
         // Mobile sign-in
-        final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+        final GoogleSignInAccount? googleUser = await _googleSignIn
+            .authenticate();
         if (googleUser == null) return null;
 
         final GoogleSignInAuthentication googleAuth =

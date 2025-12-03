@@ -8,11 +8,29 @@ class AIService {
     defaultValue:
         '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',
   );
+  static const String _textApiKeySecondary = String.fromEnvironment(
+    'TEXT_API_KEY_SECONDARY',
+    defaultValue: '',
+  );
+  static const String _textApiKeyBackup = String.fromEnvironment(
+    'TEXT_API_KEY_BACKUP',
+    defaultValue: '',
+  );
+
   static const String _imageApiKey = String.fromEnvironment(
     'IMAGE_API_KEY',
     defaultValue:
         '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',
   );
+  static const String _imageApiKeySecondary = String.fromEnvironment(
+    'IMAGE_API_KEY_SECONDARY',
+    defaultValue: '',
+  );
+  static const String _imageApiKeyBackup = String.fromEnvironment(
+    'IMAGE_API_KEY_BACKUP',
+    defaultValue: '',
+  );
+
   static const String _baseUrl =
       'https://openrouter.ai/api/v1/chat/completions';
   static const String _textModel = 'x-ai/grok-4.1-fast:free';
@@ -80,10 +98,10 @@ class AIService {
       },
     ];
 
-    final response = await _sendRequest(
-      messages,
+    final response = await _sendRequestWithRetry(
+      messages: messages,
       model: _imageModel,
-      apiKey: _imageApiKey,
+      apiKeys: [_imageApiKey, _imageApiKeySecondary, _imageApiKeyBackup],
     );
     final json = jsonDecode(response);
     return Question(
@@ -100,10 +118,10 @@ class AIService {
     final messages = [
       {'role': 'user', 'content': prompt},
     ];
-    final content = await _sendRequest(
-      messages,
+    final content = await _sendRequestWithRetry(
+      messages: messages,
       model: model,
-      apiKey: _textApiKey,
+      apiKeys: [_textApiKey, _textApiKeySecondary, _textApiKeyBackup],
     );
     final List<dynamic> jsonList = jsonDecode(content);
 
@@ -116,6 +134,23 @@ class AIService {
           ),
         )
         .toList();
+  }
+
+  Future<String> _sendRequestWithRetry({
+    required List<Map<String, dynamic>> messages,
+    required String model,
+    required List<String> apiKeys,
+  }) async {
+    for (final apiKey in apiKeys) {
+      if (apiKey.isEmpty) continue;
+      try {
+        return await _sendRequest(messages, model: model, apiKey: apiKey);
+      } catch (e) {
+        print('Failed with API key: $apiKey. Error: $e');
+        // Continue to next key
+      }
+    }
+    throw Exception('All API keys failed to generate questions.');
   }
 
   Future<String> _sendRequest(
