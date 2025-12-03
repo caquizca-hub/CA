@@ -50,13 +50,34 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAzVUzRTU-EBlZcN43-FzWVQc-L7rhJzIA',
-    appId: '1:552806970314:web:3e765feb650fa7a811d533',
-    messagingSenderId: '552806970314',
-    projectId: 'ca-quizz-104ab',
-    authDomain: 'ca-quizz-104ab.firebaseapp.com',
-    storageBucket: 'ca-quizz-104ab.firebasestorage.app',
-    measurementId: 'G-E1VC1RR529',
+    apiKey: String.fromEnvironment(
+      'FIREBASE_API_KEY',
+      defaultValue: 'AIzaSyAzVUzRTU-EBlZcN43-FzWVQc-L7rhJzIA',
+    ),
+    appId: String.fromEnvironment(
+      'FIREBASE_APP_ID',
+      defaultValue: '1:552806970314:web:3e765feb650fa7a811d533',
+    ),
+    messagingSenderId: String.fromEnvironment(
+      'FIREBASE_MESSAGING_SENDER_ID',
+      defaultValue: '552806970314',
+    ),
+    projectId: String.fromEnvironment(
+      'FIREBASE_PROJECT_ID',
+      defaultValue: 'ca-quizz-104ab',
+    ),
+    authDomain: String.fromEnvironment(
+      'FIREBASE_AUTH_DOMAIN',
+      defaultValue: 'ca-quizz-104ab.firebaseapp.com',
+    ),
+    storageBucket: String.fromEnvironment(
+      'FIREBASE_STORAGE_BUCKET',
+      defaultValue: 'ca-quizz-104ab.firebasestorage.app',
+    ),
+    measurementId: String.fromEnvironment(
+      'FIREBASE_MEASUREMENT_ID',
+      defaultValue: 'G-E1VC1RR529',
+    ),
   );
 
   static const FirebaseOptions android = FirebaseOptions(

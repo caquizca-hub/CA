@@ -25,5 +25,12 @@ When deploying to Vercel, go to **Settings > Environment Variables** and add the
 |-----|-------|-------------|
 | `TEXT_API_KEY` | `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` | API Key for text generation (OpenRouter) |
 | `IMAGE_API_KEY` | `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` | API Key for image generation (OpenRouter) |
+| `FIREBASE_API_KEY` | `AIzaSyAzVUzRTU-EBlZcN43-FzWVQc-L7rhJzIA` | Firebase API Key |
+| `FIREBASE_AUTH_DOMAIN` | `ca-quizz-104ab.firebaseapp.com` | Firebase Auth Domain |
+| `FIREBASE_PROJECT_ID` | `ca-quizz-104ab` | Firebase Project ID |
+| `FIREBASE_STORAGE_BUCKET` | `ca-quizz-104ab.firebasestorage.app` | Firebase Storage Bucket |
+| `FIREBASE_MESSAGING_SENDER_ID` | `552806970314` | Firebase Messaging Sender ID |
+| `FIREBASE_APP_ID` | `1:552806970314:web:3e765feb650fa7a811d533` | Firebase App ID |
+| `FIREBASE_MEASUREMENT_ID` | `G-E1VC1RR529` | Firebase Measurement ID |
 
 These keys are required for the AI features to work correctly in the production build.
